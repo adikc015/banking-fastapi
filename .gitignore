@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Local data
+banking.db
+*.sqlite3
+logs/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
