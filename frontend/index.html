@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Banking FastAPI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/frontend/styles.css" />
+</head>
+<body>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow-a" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow-b" aria-hidden="true"></div>
+
+  <main class="shell">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">FastAPI Banking Lab</p>
+        <h1>Banking backend,<br />with a live operations cockpit.</h1>
+        <p class="subhead">Build faster while learning: auth, KYC, account flows, fraud-aware transactions, loans, notifications, and OAuth in one UI.</p>
+      </div>
+      <div class="hero-card">
+        <div class="status-dot" id="statusDot"></div>
+        <div>
+          <strong id="globalStatus">Ready</strong>
+          <p id="statusSubtext">Sign in to unlock account, transaction, loan, and notification actions.</p>
+        </div>
+      </div>
+      <div class="metric-strip">
+        <article>
+          <span>Accounts</span>
+          <strong id="metricAccounts">0</strong>
+        </article>
+        <article>
+          <span>Transactions</span>
+          <strong id="metricTransactions">0</strong>
+        </article>
+        <article>
+          <span>Loans</span>
+          <strong id="metricLoans">0</strong>
+        </article>
+        <article>
+          <span>Alerts</span>
+          <strong id="metricNotifications">0</strong>
+        </div>
+      </div>
+    </section>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="auth">Auth</button>
+      <button class="tab" data-tab="accounts">Accounts</button>
+      <button class="tab" data-tab="transactions">Transactions</button>
+      <button class="tab" data-tab="loans">Loans</button>
+      <button class="tab" data-tab="notifications">Notifications</button>
+    </nav>
+
+    <section class="panel-grid">
+      <article class="panel active" id="auth">
+        <h2>Identity and Access</h2>
+        <label>Full Name <input id="fullName" placeholder="Aditya Kumar" /></label>
+        <label>Email <input id="email" type="email" placeholder="you@example.com" /></label>
+        <label>Password <input id="password" type="password" placeholder="********" /></label>
+        <label>Role
+          <select id="role">
+            <option value="customer">Customer</option>
+            <option value="admin">Admin</option>
+          </select>
+        </label>
+        <div class="row">
+          <button onclick="registerUser()">Register</button>
+          <button class="secondary" onclick="loginUser()">Login</button>
+          <button class="secondary" onclick="googleLogin()">Google OAuth</button>
+        </div>
+
+        <h3>KYC Verification</h3>
+        <label>Aadhaar <input id="aadhaar" placeholder="123412341234" /></label>
+        <label>PAN <input id="pan" placeholder="ABCDE1234F" /></label>
+        <button class="secondary" onclick="verifyKyc()">Verify KYC</button>
+
+        <p class="token-label">JWT Token</p>
+        <textarea id="token" rows="4" placeholder="Login to populate token"></textarea>
+        <div class="row">
+          <button class="ghost" onclick="copyToken()">Copy Token</button>
+          <button class="ghost" onclick="clearToken()">Clear Token</button>
+        </div>
+      </article>
+
+      <article class="panel" id="accounts">
+        <h2>Account Workspace</h2>
+        <label>Account Type
+          <select id="accountType">
+            <option value="savings">Savings</option>
+            <option value="current">Current</option>
+          </select>
+        </label>
+        <div class="row">
+          <button onclick="createAccount()">Create Account</button>
+          <button class="secondary" onclick="loadAccounts()">Refresh Accounts</button>
+        </div>
+        <pre id="accountsOut"></pre>
+      </article>
+
+      <article class="panel" id="transactions">
+        <h2>Transaction Engine</h2>
+        <label>Account ID <input id="txAccountId" type="number" /></label>
+        <label>To Account ID <input id="toAccountId" type="number" /></label>
+        <label>Amount <input id="amount" type="number" step="0.01" /></label>
+        <label>Location <input id="location" placeholder="Mumbai" /></label>
+        <div class="row">
+          <button onclick="deposit()">Deposit</button>
+          <button onclick="withdraw()">Withdraw</button>
+          <button class="secondary" onclick="transferFunds()">Transfer</button>
+        </div>
+        <button class="secondary" onclick="loadTransactions()">Refresh Transactions</button>
+        <pre id="transactionsOut"></pre>
+      </article>
+
+      <article class="panel" id="loans">
+        <h2>Loan Desk</h2>
+        <label>Principal <input id="principal" type="number" step="0.01" /></label>
+        <label>Annual Interest Rate <input id="interestRate" type="number" step="0.01" /></label>
+        <label>Tenure Months <input id="tenure" type="number" /></label>
+        <button onclick="applyLoan()">Apply Loan</button>
+        <button class="secondary" onclick="loadLoans()">Refresh Loans</button>
+        <pre id="loansOut"></pre>
+      </article>
+
+      <article class="panel" id="notifications">
+        <h2>Alerts Center</h2>
+        <div class="row">
+          <button onclick="loadNotifications()">Refresh Notifications</button>
+          <button class="secondary" onclick="markFirstNotificationRead()">Mark First as Read</button>
+        </div>
+        <pre id="notificationsOut"></pre>
+      </article>
+    </section>
+
+    <section class="footer-card">
+      <p>Tip: run actions from left to right: register/login, KYC, account creation, transactions, then loans and notifications.</p>
+    </section>
+  </main>
+
+  <aside id="toast" class="toast" role="status" aria-live="polite"></aside>
+  <script src="/frontend/app.js"></script>
+</body>
+</html>

@@ -1,8 +1,12 @@
 fastapi
 uvicorn
 sqlalchemy
-aiosqlite
+aiomysql
 python-jose[cryptography]
 bcrypt
 python-multipart
 pydantic[email]
+python-dotenv
+authlib
+itsdangerous
+httpx

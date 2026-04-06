@@ -7,7 +7,7 @@ from models.account import Account
 from models.transaction import Transaction
 from models.user import User, UserRole
 from schemas.transaction import DepositRequest, TransactionOut, TransferRequest, WithdrawRequest
-from services.notification_service import send_transaction_alert
+from services.notification_service import create_notification, send_transaction_alert
 from services.payment_service import deposit, transfer, withdraw
 from utils.rate_limiter import limiter
 from utils.security import get_current_user
@@ -34,6 +34,7 @@ async def deposit_money(
 ) -> Transaction:
 	await _validate_account_owner(db, payload.account_id, current_user.id)
 	tx = await deposit(db, payload.account_id, payload.amount, payload.location)
+	await create_notification(db, current_user.id, "Deposit completed", f"Deposit of {payload.amount} was completed")
 	background_tasks.add_task(send_transaction_alert, current_user.email, f"Deposit successful: {payload.amount}")
 	return tx
 
@@ -49,6 +50,7 @@ async def withdraw_money(
 ) -> Transaction:
 	await _validate_account_owner(db, payload.account_id, current_user.id)
 	tx = await withdraw(db, payload.account_id, payload.amount, payload.location)
+	await create_notification(db, current_user.id, "Withdrawal completed", f"Withdrawal of {payload.amount} was completed")
 	background_tasks.add_task(send_transaction_alert, current_user.email, f"Withdraw successful: {payload.amount}")
 	return tx
 
@@ -69,6 +71,12 @@ async def transfer_money(
 		to_account_id=payload.to_account_id,
 		amount=payload.amount,
 		location=payload.location,
+	)
+	await create_notification(
+		db,
+		current_user.id,
+		"Transfer completed",
+		f"Transfer of {payload.amount} to account {payload.to_account_id} was completed",
 	)
 	background_tasks.add_task(
 		send_transaction_alert,

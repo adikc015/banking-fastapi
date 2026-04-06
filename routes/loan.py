@@ -9,7 +9,7 @@ from models.loan import Loan, LoanStatus
 from models.user import User, UserRole
 from schemas.loan import LoanApplyRequest, LoanOut, LoanReviewRequest
 from services.loan_service import calculate_emi
-from services.notification_service import send_loan_update
+from services.notification_service import create_notification, send_loan_update
 from utils.security import get_current_user
 
 router = APIRouter()
@@ -36,6 +36,7 @@ async def apply_loan(
 	db.add(loan)
 	await db.commit()
 	await db.refresh(loan)
+	await create_notification(db, current_user.id, "Loan application submitted", f"Your loan request for {payload.principal_amount} was submitted")
 	return loan
 
 
@@ -66,6 +67,7 @@ async def review_loan(
 
 	user = await db.get(User, loan.user_id)
 	if user:
+		await create_notification(db, user.id, "Loan status updated", f"Your loan #{loan.id} is {loan.status.value}")
 		background_tasks.add_task(
 			send_loan_update,
 			user.email,

@@ -1,9 +1,13 @@
 from fastapi import FastAPI
 from fastapi import Request
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+from starlette.middleware.sessions import SessionMiddleware
 
 from database import init_db
-from routes import account, auth, loan, transaction
+from routes import account, auth, loan, notification, oauth, transaction
 from utils.logger import configure_logging, get_logger
+from utils.security import SECRET_KEY
 
 configure_logging()
 logger = get_logger("audit")
@@ -14,10 +18,15 @@ app = FastAPI(
 	version="1.0.0",
 )
 
+app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
+app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
+
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
+app.include_router(oauth.router, prefix="/auth", tags=["OAuth"])
 app.include_router(account.router, prefix="/accounts", tags=["Accounts"])
 app.include_router(transaction.router, prefix="/transactions", tags=["Transactions"])
 app.include_router(loan.router, prefix="/loans", tags=["Loans"])
+app.include_router(notification.router, prefix="/notifications", tags=["Notifications"])
 
 
 @app.middleware("http")
@@ -34,5 +43,5 @@ async def startup_event() -> None:
 
 
 @app.get("/")
-async def root() -> dict[str, str]:
-	return {"message": "Banking API is running", "docs": "/docs"}
+async def root() -> FileResponse:
+	return FileResponse("frontend/index.html")

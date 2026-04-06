@@ -18,7 +18,7 @@ async def deposit(db: AsyncSession, account_id: int, amount: float, location: st
 	if value <= 0:
 		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Amount must be greater than zero")
 
-	async with db.begin():
+	try:
 		account = await db.get(Account, account_id)
 		if account is None:
 			raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Account not found")
@@ -34,6 +34,10 @@ async def deposit(db: AsyncSession, account_id: int, amount: float, location: st
 			fraud_reason=", ".join(reasons) if reasons else None,
 		)
 		db.add(tx)
+		await db.commit()
+	except Exception:
+		await db.rollback()
+		raise
 
 	await db.refresh(tx)
 	return tx
@@ -44,7 +48,7 @@ async def withdraw(db: AsyncSession, account_id: int, amount: float, location: s
 	if value <= 0:
 		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Amount must be greater than zero")
 
-	async with db.begin():
+	try:
 		query = select(Account).where(Account.id == account_id).with_for_update()
 		result = await db.execute(query)
 		account = result.scalar_one_or_none()
@@ -69,6 +73,10 @@ async def withdraw(db: AsyncSession, account_id: int, amount: float, location: s
 			fraud_reason=", ".join(reasons) if reasons else None,
 		)
 		db.add(tx)
+		await db.commit()
+	except Exception:
+		await db.rollback()
+		raise
 
 	await db.refresh(tx)
 	return tx
@@ -87,7 +95,7 @@ async def transfer(
 	if from_account_id == to_account_id:
 		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Source and destination must differ")
 
-	async with db.begin():
+	try:
 		ordered_ids = sorted([from_account_id, to_account_id])
 		query = select(Account).where(Account.id.in_(ordered_ids)).with_for_update()
 		result = await db.execute(query)
@@ -116,6 +124,10 @@ async def transfer(
 			fraud_reason=", ".join(reasons) if reasons else None,
 		)
 		db.add(tx)
+		await db.commit()
+	except Exception:
+		await db.rollback()
+		raise
 
 	await db.refresh(tx)
 	return tx

@@ -5,6 +5,7 @@ This project is structured to help you learn FastAPI by building a realistic ban
 ## Features Implemented (Phase 1)
 
 - JWT Authentication (register/login)
+- OAuth login scaffold with Google-ready flow
 - Role-based users: admin, customer
 - KYC simulation (Aadhaar/PAN)
 - Multiple bank accounts per user (savings/current)
@@ -19,6 +20,8 @@ This project is structured to help you learn FastAPI by building a realistic ban
   - location mismatch
 - Loan apply + EMI calculation + admin approval
 - Notification hooks via FastAPI background tasks (simulated email/SMS logs)
+- Persistent in-app notifications
+- Frontend UI served from `frontend/`
 - Admin dashboard APIs:
   - list users
   - list all transactions
@@ -30,6 +33,8 @@ This project is structured to help you learn FastAPI by building a realistic ban
 ## Step-by-Step Learning Path
 
 ### Step 1: Run the app
+
+Before starting, create a MySQL database named `banking_app` and set your connection string in `.env` based on `.env.example`.
 
 ```bash
 uvicorn main:app --reload
@@ -46,6 +51,7 @@ Open:
    - `username` = email
    - `password` = your password
 3. Copy token and use **Authorize** button in Swagger UI.
+4. Optional: click the Google OAuth button in the frontend once you configure OAuth credentials.
 
 ### Step 3: KYC verification
 
@@ -113,4 +119,10 @@ Where:
 - `routes/` - API routers by domain
 - `services/` - business logic modules
 - `utils/` - security, logging, helper utilities
+
+## MySQL Notes
+
+- Database driver: `aiomysql`
+- Environment variable: `DATABASE_URL=mysql+aiomysql://user:password@host:3306/banking_app`
+- If you use local MySQL, make sure the database exists before first startup
 
